@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Rotas Agrícolas</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #222;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(8, 50px); /* 8 colunas */
+      grid-template-rows: repeat(8, 50px);    /* 8 linhas */
+      gap: 5px;
+      background: black;
+      padding: 5px;
+      margin-bottom: 20px;
+    }
+
+    .cell {
+      width: 50px;
+      height: 50px;
+      background: #4CAF50; /* verde livre */
+      border: 1px solid #111;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .cell.obstacle {
+      background: brown; /* obstáculo */
+    }
+
+    .cell.start {
+      background: blue; /* ponto inicial */
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    #modeDisplay {
+      margin-left: 10px;
+      font-weight: bold;
+      color: yellow;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid" id="grid"></div>
+
+  <div class="controls">
+    <button id="toggleMode">Alternar Modo</button>
+    <span>Modo atual: <span id="modeDisplay">Obstáculo</span></span>
+  </div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const toggleButton = document.getElementById("toggleMode");
+    const modeDisplay = document.getElementById("modeDisplay");
+
+    let mode = "obstacle"; // modos: "obstacle" ou "start"
+    let startCell = null; // para garantir apenas 1 ponto inicial
+
+    // Alternar modo ao clicar no botão
+    toggleButton.addEventListener("click", () => {
+      mode = (mode === "obstacle") ? "start" : "obstacle";
+      modeDisplay.textContent = mode === "obstacle" ? "Obstáculo" : "Ponto Inicial";
+    });
+
+    // Criar a grade 8x8
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+
+        // Evento de clique em cada célula
+        cell.addEventListener("click", () => {
+          if (mode === "obstacle") {
+            cell.classList.toggle("obstacle");
+            cell.classList.remove("start"); // se tinha start, remove
+            if (startCell === cell) startCell = null; // limpa referência
+          } else if (mode === "start") {
+            if (startCell) startCell.classList.remove("start"); // remover anterior
+            cell.classList.add("start");
+            cell.classList.remove("obstacle"); // não pode ser obstáculo
+            startCell = cell;
+          }
+        });
+
+        grid.appendChild(cell);
+      }
+    }
+  </script>
+</body>
+</html>
+
